@@ -1,0 +1,488 @@
+{
+  "info": {
+    "name": "Student Management System",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "adminToken", "value": "" },
+    { "key": "studentToken", "value": "" },
+    { "key": "studentId", "value": "" },
+    { "key": "courseId", "value": "" }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Admin Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('adminToken', res.data.token);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin", "login"]
+            }
+          }
+        },
+        {
+          "name": "Student Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.token) {",
+                  "    pm.collectionVariables.set('studentToken', res.data.token);",
+                  "}",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('studentId', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU001\",\n  \"dateOfBirth\": \"2000-05-15\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/student/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "student", "login"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Students",
+      "item": [
+        {
+          "name": "Create Student",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('studentId', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU001\",\n  \"name\": \"Aarav Sharma\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"gender\": \"MALE\",\n  \"email\": \"aarav.sharma@example.com\",\n  \"mobileNumber\": \"9876543210\",\n  \"fatherName\": \"Raj Sharma\",\n  \"motherName\": \"Sunita Sharma\",\n  \"addresses\": [\n    {\n      \"addressType\": \"PERMANENT\",\n      \"addressLine\": \"12 MG Road\",\n      \"city\": \"Ahmedabad\",\n      \"state\": \"Gujarat\",\n      \"country\": \"India\",\n      \"postalCode\": \"380001\"\n    },\n    {\n      \"addressType\": \"CURRENT\",\n      \"addressLine\": \"45 Hostel Block B\",\n      \"city\": \"Ahmedabad\",\n      \"state\": \"Gujarat\",\n      \"country\": \"India\",\n      \"postalCode\": \"380015\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Get Student By Id",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Students (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Search Students By Name",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/search?name=Aarav&page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "search"],
+              "query": [
+                { "key": "name", "value": "Aarav" },
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Student",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU001\",\n  \"name\": \"Aarav Sharma\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"gender\": \"MALE\",\n  \"email\": \"aarav.updated@example.com\",\n  \"mobileNumber\": \"9876500000\",\n  \"fatherName\": \"Raj Sharma\",\n  \"motherName\": \"Sunita Sharma\",\n  \"addresses\": [\n    {\n      \"addressType\": \"PERMANENT\",\n      \"addressLine\": \"12 MG Road\",\n      \"city\": \"Ahmedabad\",\n      \"state\": \"Gujarat\",\n      \"country\": \"India\",\n      \"postalCode\": \"380001\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Student",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "{{studentId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Admin - Courses",
+      "item": [
+        {
+          "name": "Create Course",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "const res = pm.response.json();",
+                  "if (res.data && res.data.id) {",
+                  "    pm.collectionVariables.set('courseId', res.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Backend Development with Spring Boot\",\n  \"description\": \"Covers REST APIs, JPA, and Spring Security\",\n  \"courseType\": \"TECHNICAL\",\n  \"duration\": 8,\n  \"topics\": [\"REST APIs\", \"JPA\", \"Hibernate\", \"Spring Security\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/courses",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"]
+            }
+          }
+        },
+        {
+          "name": "Update Course",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"courseName\": \"Backend Development with Spring Boot\",\n  \"description\": \"Updated: now includes Swagger and testing\",\n  \"courseType\": \"TECHNICAL\",\n  \"duration\": 10,\n  \"topics\": [\"REST APIs\", \"JPA\", \"Hibernate\", \"Spring Security\", \"Swagger\"]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get All Courses (paginated)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses?page=0&size=10",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses"],
+              "query": [
+                { "key": "page", "value": "0" },
+                { "key": "size", "value": "10" }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Assign Course To Student",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Students Assigned To Course",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", "students"]
+            }
+          }
+        },
+        {
+          "name": "Get Courses For a Student (admin view)",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/student/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "student", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Remove Student From Course (admin)",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}/students/{{studentId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}", "students", "{{studentId}}"]
+            }
+          }
+        },
+        {
+          "name": "Delete Course",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "{{courseId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Student Self-Service",
+      "item": [
+        {
+          "name": "Update Own Profile",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"aarav.new@example.com\",\n  \"mobileNumber\": \"9998887777\",\n  \"fatherName\": \"Raj Sharma\",\n  \"motherName\": \"Sunita Sharma\",\n  \"addresses\": [\n    {\n      \"addressType\": \"CORRESPONDENCE\",\n      \"addressLine\": \"78 Park Street\",\n      \"city\": \"Ahmedabad\",\n      \"state\": \"Gujarat\",\n      \"country\": \"India\",\n      \"postalCode\": \"380009\"\n    }\n  ]\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students/me/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "me", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Get My Courses",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/me",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "me"]
+            }
+          }
+        },
+        {
+          "name": "Leave a Course",
+          "request": {
+            "method": "DELETE",
+            "header": [{ "key": "Authorization", "value": "Bearer {{studentToken}}" }],
+            "url": {
+              "raw": "{{baseUrl}}/api/courses/me/{{courseId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "courses", "me", "{{courseId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Negative / Security Tests",
+      "item": [
+        {
+          "name": "Create Student WITHOUT token (expect 401/403)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU999\",\n  \"name\": \"No Auth\",\n  \"dateOfBirth\": \"2001-01-01\",\n  \"gender\": \"MALE\",\n  \"email\": \"noauth@example.com\",\n  \"mobileNumber\": \"9000000000\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Create Student WITH student token (expect 403 - wrong role)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{studentToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU999\",\n  \"name\": \"Wrong Role\",\n  \"dateOfBirth\": \"2001-01-01\",\n  \"gender\": \"MALE\",\n  \"email\": \"wrongrole@example.com\",\n  \"mobileNumber\": \"9000000001\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        },
+        {
+          "name": "Update Own Profile WITH admin token (expect 403 - wrong role)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"shouldfail@example.com\",\n  \"mobileNumber\": \"9000000002\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students/me/profile",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students", "me", "profile"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Admin Login (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"admin\",\n  \"password\": \"wrongpassword\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/admin/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "admin", "login"]
+            }
+          }
+        },
+        {
+          "name": "Invalid Student Login (expect 401)",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU001\",\n  \"dateOfBirth\": \"1999-01-01\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/auth/student/login",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "auth", "student", "login"]
+            }
+          }
+        },
+        {
+          "name": "Duplicate Student Code (expect 409)",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "Authorization", "value": "Bearer {{adminToken}}" }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"studentCode\": \"STU001\",\n  \"name\": \"Duplicate Test\",\n  \"dateOfBirth\": \"2000-05-15\",\n  \"gender\": \"MALE\",\n  \"email\": \"duplicate@example.com\",\n  \"mobileNumber\": \"9111111111\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/students",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "students"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

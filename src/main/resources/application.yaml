@@ -1,0 +1,22 @@
+spring:
+  application:
+    name: demo
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/studentmgmt
+    username: postgres
+    password: admin
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: true
+
+
+server:
+  port: 8080
+
+jwt:
+  secret: 8d7c9f2a4b6e1d3f5a7c9e2b4d6f8a1c9d7e5f3a1b2c4d6e
+  expiration: 86400000
